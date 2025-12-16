@@ -136,7 +136,16 @@ async Task SeedRolesAsync(IServiceProvider sp)
 
 using (var scope = app.Services.CreateScope())
 {
-    await SeedRolesAsync(scope.ServiceProvider);
+    try
+    {
+        await SeedRolesAsync(scope.ServiceProvider);
+        Console.WriteLine("✅ Roles seeded successfully");
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"⚠️ Warning: Failed to seed roles: {ex.Message}");
+        // Don't crash the app - continue startup even if role seeding fails
+    }
 }
 
 // ---- 9) Middleware-Reihenfolge ----
@@ -171,4 +180,16 @@ if (!app.Environment.IsDevelopment())
     app.UseStaticFiles();
     app.MapFallbackToFile("index.html");
 }
+
+// Log URLs when application has started
+app.Lifetime.ApplicationStarted.Register(() =>
+{
+    var urls = app.Urls;
+    if (urls.Any())
+    {
+        Console.WriteLine($"✅ API läuft auf: {string.Join(", ", urls)}");
+    }
+});
+
+app.Run();
 
