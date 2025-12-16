@@ -9,6 +9,7 @@ using ShareSphere.Api.Models;
 using ShareSphere.Api.Services;
 using System.Text;
 using Microsoft.AspNetCore.HttpOverrides;
+using System.Security.Claims;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -52,7 +53,8 @@ builder.Services
             ValidIssuer = jwtIssuer,
             ValidAudience = jwtAudience,
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey)),
-            RoleClaimType = "role",
+    RoleClaimType = ClaimTypes.Role,  // <-- ÄNDERE VON "role" ZU ClaimTypes.Role
+    NameClaimType = ClaimTypes.Name,  // <-- ÄNDERE VON "unique_name" ZU ClaimTypes.Name
             ClockSkew = TimeSpan.Zero
         };
     });
