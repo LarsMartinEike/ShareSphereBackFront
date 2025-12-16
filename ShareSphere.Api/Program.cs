@@ -138,7 +138,7 @@ using (var scope = app.Services.CreateScope())
 async Task SeedRolesAsync(IServiceProvider sp)
 {
     var roleManager = sp.GetRequiredService<RoleManager<IdentityRole>>();
-    string[] roles = ["shareholder", "admin"];
+    string[] roles = ["user", "admin"];
 
     foreach (var r in roles)
     {
