@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("ShareSphere.Api")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+69f7e35462cc4f76eef0e2bfd2227de3dcf83807")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+ec24329401a5a86cebfd8c506fce3fa3983859fe")]
 [assembly: System.Reflection.AssemblyProductAttribute("ShareSphere.Api")]
 [assembly: System.Reflection.AssemblyTitleAttribute("ShareSphere.Api")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

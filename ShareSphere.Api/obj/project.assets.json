@@ -3979,19 +3979,19 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\Lars\\.nuget\\packages\\": {}
+    "/home/runner/.nuget/packages/": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\Lars\\ShareSphere\\ShareSphere.Api\\ShareSphere.Api.csproj",
+      "projectUniqueName": "/home/runner/work/ShareSphereBackFront/ShareSphereBackFront/ShareSphere.Api/ShareSphere.Api.csproj",
       "projectName": "ShareSphere.Api",
-      "projectPath": "C:\\Users\\Lars\\ShareSphere\\ShareSphere.Api\\ShareSphere.Api.csproj",
-      "packagesPath": "C:\\Users\\Lars\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\Lars\\ShareSphere\\ShareSphere.Api\\obj\\",
+      "projectPath": "/home/runner/work/ShareSphereBackFront/ShareSphereBackFront/ShareSphere.Api/ShareSphere.Api.csproj",
+      "packagesPath": "/home/runner/.nuget/packages/",
+      "outputPath": "/home/runner/work/ShareSphereBackFront/ShareSphereBackFront/ShareSphere.Api/obj/",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "C:\\Users\\Lars\\AppData\\Roaming\\NuGet\\NuGet.Config"
+        "/home/runner/.nuget/NuGet/NuGet.Config"
       ],
       "originalTargetFrameworks": [
         "net10.0"
@@ -4067,7 +4067,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.101/PortableRuntimeIdentifierGraph.json",
+        "runtimeIdentifierGraphPath": "/usr/share/dotnet/sdk/10.0.100/PortableRuntimeIdentifierGraph.json",
         "packagesToPrune": {
           "Microsoft.AspNetCore": "(,10.0.32767]",
           "Microsoft.AspNetCore.Antiforgery": "(,10.0.32767]",
