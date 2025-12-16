@@ -1,4 +1,4 @@
-using Microsoft. AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ShareSphere.Api.Models;
 using ShareSphere.Api.Services;
@@ -8,7 +8,7 @@ namespace ShareSphere.Api.Controllers
 {
     [ApiController]
     [Route("api/stockexchanges")]
-    public class StockExchangeController :  ControllerBase
+    public class StockExchangeController : ControllerBase
     {
         private readonly IStockExchangeService _stockExchangeService;
 
@@ -32,7 +32,7 @@ namespace ShareSphere.Api.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
-            var exchanges = await _stockExchangeService. GetAllAsync();
+            var exchanges = await _stockExchangeService.GetAllAsync();
             return Ok(exchanges);
         }
 
@@ -50,9 +50,9 @@ namespace ShareSphere.Api.Controllers
         }
 
         /// <summary>
-        /// Erstellt eine neue Stock Exchange (nur für Admins)
+        /// Erstellt eine neue Stock Exchange (für Admins und Users)
         /// </summary>
-        [Authorize(Roles = "admin")]
+        [Authorize(Roles = "admin,user")]
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] StockExchangeRequest request)
         {
@@ -64,13 +64,13 @@ namespace ShareSphere.Api.Controllers
             };
 
             var created = await _stockExchangeService.CreateAsync(stockExchange);
-            return CreatedAtAction(nameof(GetById), new { id = created. ExchangeId }, created);
+            return CreatedAtAction(nameof(GetById), new { id = created.ExchangeId }, created);
         }
 
         /// <summary>
-        /// Aktualisiert eine bestehende Stock Exchange (nur für Admins)
+        /// Aktualisiert eine bestehende Stock Exchange (für Admins und Users)
         /// </summary>
-        [Authorize(Roles = "admin")]
+        [Authorize(Roles = "admin,user")]
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(int id, [FromBody] StockExchangeRequest request)
         {

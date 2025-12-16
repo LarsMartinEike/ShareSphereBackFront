@@ -23,7 +23,7 @@ namespace ShareSphere.Api.Data
             // 2) Admin-Benutzer erstellen, falls er noch nicht existiert
             const string adminUserName = "admin";
             const string adminEmail = "admin@sharesphere.com";
-            const string adminPassword = "Admin123! "; // ⚠️ Ändern Sie dies in Production!
+            const string adminPassword = "Admin123!"; // ⚠️ Ändern Sie dies in Production!
 
             var adminUser = await userManager.FindByNameAsync(adminUserName);
             
@@ -52,7 +52,7 @@ namespace ShareSphere.Api.Data
             }
             else
             {
-                Console. WriteLine($"ℹ Admin user '{adminUserName}' already exists");
+                Console.WriteLine($"ℹ Admin user '{adminUserName}' already exists");
             }
         }
     }

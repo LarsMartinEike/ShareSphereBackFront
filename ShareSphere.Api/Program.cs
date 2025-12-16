@@ -115,7 +115,7 @@ builder.Services.AddScoped<ShareSphere.Api.Services.IAuthService, ShareSphere.Ap
 builder.Services.AddScoped<IStockExchangeService, StockExchangeService>();
 var app = builder.Build();
 
-Console.WriteLine($"API läuft auf: {string.Join(", ", app. Urls)}");
+Console.WriteLine($"API läuft auf: {string.Join(", ", app.Urls)}");
 // ---- 8) Rollen seeden ----
 using (var scope = app.Services.CreateScope())
 {
@@ -123,7 +123,7 @@ using (var scope = app.Services.CreateScope())
     try
     {
         var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
-        var roleManager = services. GetRequiredService<RoleManager<IdentityRole>>();
+        var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
         
         await DbInitializer.SeedAdminUser(userManager, roleManager);
     }
@@ -135,29 +135,7 @@ using (var scope = app.Services.CreateScope())
 }
 
 
-async Task SeedRolesAsync(IServiceProvider sp)
-{
-    var roleManager = sp.GetRequiredService<RoleManager<IdentityRole>>();
-    string[] roles = ["user", "admin"];
 
-    foreach (var r in roles)
-    {
-        if (!await roleManager.RoleExistsAsync(r))
-        {
-            var create = await roleManager.CreateAsync(new IdentityRole(r));
-            if (!create.Succeeded)
-            {
-                throw new Exception($"Rolle '{r}' konnte nicht erstellt werden: " +
-                    string.Join(", ", create.Errors.Select(e => e.Description)));
-            }
-        }
-    }
-}
-
-using (var scope = app.Services.CreateScope())
-{
-    await SeedRolesAsync(scope.ServiceProvider);
-}
 
 // ---- 9) Middleware-Reihenfolge ----
 

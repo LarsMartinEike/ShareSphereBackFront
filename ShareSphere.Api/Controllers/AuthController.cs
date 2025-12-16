@@ -35,9 +35,9 @@ namespace ShareSphere.Api.Controllers
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegisterRequest req)
         {
-            // Falls keine Rollen übergeben wurden, Standard-Rolle "shareholder" setzen
+            // Falls keine Rollen übergeben wurden, Standard-Rolle "user" setzen
 
-            var result = await _auth.RegisterAsync(req.UserName, req.DisplayName, req.Password, new[] {"shareholder"});
+            var result = await _auth.RegisterAsync(req.UserName, req.DisplayName, req.Password, new[] {"user"});
             if (!result.Succeeded)
             {
                 // Einheitliches Fehlerformat (Identity-Fehler, doppelte Usernames, falsche Rollen)

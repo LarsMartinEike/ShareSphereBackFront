@@ -55,7 +55,7 @@ namespace ShareSphere.Api.Services
             var normalizedRoles = (roles ?? Array.Empty<string>())
                                   .Select(r => r.Trim().ToLowerInvariant())
                                   .Where(r => !string.IsNullOrWhiteSpace(r))
-                                  .DefaultIfEmpty("shareholder") // Defaultrolle, falls nichts übergeben
+                                  .DefaultIfEmpty("user") // Defaultrolle, falls nichts übergeben
                                   .ToArray();
 
             System.Console.WriteLine(normalizedRoles);

@@ -23,19 +23,19 @@ namespace ShareSphere.Api.Services
         {
             return await _context.StockExchanges
                 .Include(se => se.Companies)
-                .FirstOrDefaultAsync(se => se. ExchangeId == exchangeId);
+                .FirstOrDefaultAsync(se => se.ExchangeId == exchangeId);
         }
 
         public async Task<StockExchange> CreateAsync(StockExchange stockExchange)
         {
-            _context.StockExchanges. Add(stockExchange);
+            _context.StockExchanges.Add(stockExchange);
             await _context.SaveChangesAsync();
             return stockExchange;
         }
 
         public async Task<StockExchange?> UpdateAsync(int exchangeId, StockExchange stockExchange)
         {
-            var existing = await _context.StockExchanges. FindAsync(exchangeId);
+            var existing = await _context.StockExchanges.FindAsync(exchangeId);
             if (existing == null)
                 return null;
 
@@ -49,7 +49,7 @@ namespace ShareSphere.Api.Services
 
         public async Task<bool> DeleteAsync(int exchangeId)
         {
-            var stockExchange = await _context.StockExchanges. FindAsync(exchangeId);
+            var stockExchange = await _context.StockExchanges.FindAsync(exchangeId);
             if (stockExchange == null)
                 return false;
 
