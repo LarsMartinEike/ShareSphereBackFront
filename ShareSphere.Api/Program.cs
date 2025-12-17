@@ -124,6 +124,7 @@ builder.Services.AddScoped<IBrokerService, BrokerService>();
 builder.Services.AddScoped<IShareService, ShareService>();
 builder.Services.AddScoped<IShareholderService, ShareholderService>();
 builder.Services.AddScoped<ITradeService, TradeService>();
+builder.Services.AddScoped<ISharePurchaseService, SharePurchaseService>();
 var app = builder.Build();
 
 Console.WriteLine($"API läuft auf: {string.Join(", ", app.Urls)}");

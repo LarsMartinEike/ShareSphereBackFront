@@ -11,11 +11,16 @@ namespace ShareSphere.Api.Controllers
     public class ShareholderController : ControllerBase
     {
         private readonly IShareholderService _shareholderService;
+        private readonly ISharePurchaseService _purchaseService;
 
-        public ShareholderController(IShareholderService shareholderService)
-        {
-            _shareholderService = shareholderService;
-        }
+// Constructor erweitern:
+public ShareholderController(
+    IShareholderService shareholderService,
+    ISharePurchaseService purchaseService)
+{
+    _shareholderService = shareholderService;
+    _purchaseService = purchaseService;
+}
 
         // DTO for creating/updating shareholders
         public record ShareholderRequest(
@@ -112,5 +117,42 @@ namespace ShareSphere.Api.Controllers
 
             return NoContent();
         }
+
+      
+// DTO für Share-Kauf
+public record PurchaseShareRequest(
+    [Required] int ShareId,
+    [Required, Range(1, int.MaxValue, ErrorMessage = "Quantity must be at least 1")] int Quantity,
+    [Required] int BrokerId
+);
+
+/// <summary>
+/// Kauft Shares für einen spezifischen Shareholder
+/// </summary>
+[Authorize(Roles = "admin,user")]
+[HttpPost("{shareholderId}/purchase")]
+public async Task<IActionResult> PurchaseShares(
+    int shareholderId,
+    [FromBody] PurchaseShareRequest request)
+{
+    var result = await _purchaseService.PurchaseSharesAsync(
+        shareholderId,
+        request.ShareId,
+        request.Quantity,
+        request.BrokerId
+    );
+
+    if (!result.Success)
+    {
+        return BadRequest(new { message = result.Message });
+    }
+
+    return Ok(new
+    {
+        message = result.Message,
+        trade = result.Trade,
+        portfolio = result.Portfolio
+    });
+    }  
     }
 }
