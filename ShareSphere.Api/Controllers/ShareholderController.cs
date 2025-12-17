@@ -2,6 +2,7 @@ using Microsoft.AspNetCore. Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ShareSphere.Api.Models;
 using ShareSphere.Api.Services;
+using ShareSphere.Api.Dtos;
 using System.ComponentModel. DataAnnotations;
 
 namespace ShareSphere.Api.Controllers
@@ -11,10 +12,12 @@ namespace ShareSphere.Api.Controllers
     public class ShareholderController : ControllerBase
     {
         private readonly IShareholderService _shareholderService;
+        private readonly ISharePurchaseService _sharePurchaseService;
 
-        public ShareholderController(IShareholderService shareholderService)
+        public ShareholderController(IShareholderService shareholderService, ISharePurchaseService sharePurchaseService)
         {
             _shareholderService = shareholderService;
+            _sharePurchaseService = sharePurchaseService;
         }
 
         // DTO for creating/updating shareholders
@@ -111,6 +114,44 @@ namespace ShareSphere.Api.Controllers
                 return NotFound(new { message = $"Shareholder with ID {id} not found." });
 
             return NoContent();
+        }
+
+        /// <summary>
+        /// Kauft Shares für einen Shareholder
+        /// </summary>
+        [Authorize(Roles = "admin,user")]
+        [HttpPost("{id}/purchase")]
+        public async Task<IActionResult> PurchaseShares(int id, [FromBody] PurchaseShareRequest request)
+        {
+            // Validate that the shareholderId in the route matches the request
+            if (id != request.ShareholderId)
+            {
+                return BadRequest(new { message = "Shareholder ID in route does not match request body." });
+            }
+
+            var result = await _sharePurchaseService.PurchaseSharesAsync(
+                request.ShareholderId,
+                request.ShareId,
+                request.Quantity,
+                request.BrokerId
+            );
+
+            if (!result.Success)
+            {
+                // Determine appropriate status code based on the error message
+                if (result.Message.Contains("not found"))
+                {
+                    return NotFound(new { message = result.Message });
+                }
+                return BadRequest(new { message = result.Message });
+            }
+
+            return Ok(new
+            {
+                message = result.Message,
+                trade = result.Trade,
+                portfolio = result.Portfolio
+            });
         }
     }
 }
