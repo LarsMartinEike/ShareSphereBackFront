@@ -1,9 +1,9 @@
-using Microsoft.AspNetCore. Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ShareSphere.Api.Models;
 using ShareSphere.Api.Services;
 using ShareSphere.Api.Dtos;
-using System.ComponentModel. DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 
 namespace ShareSphere.Api.Controllers
 {
