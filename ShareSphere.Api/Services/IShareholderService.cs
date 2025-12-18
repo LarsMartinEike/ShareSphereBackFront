@@ -1,4 +1,5 @@
 using ShareSphere.Api.Models;
+using ShareSphere. Api.Models.Dtos;
 
 namespace ShareSphere.Api.Services
 {
@@ -10,5 +11,8 @@ namespace ShareSphere.Api.Services
         Task<Shareholder> CreateAsync(Shareholder shareholder);
         Task<Shareholder? > UpdateAsync(int shareholderId, Shareholder shareholder);
         Task<bool> DeleteAsync(int shareholderId);
+
+                Task<ShareholderPortfolioDto?> GetShareholderPortfolioAsync(int shareholderId);
+
     }
 }

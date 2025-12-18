@@ -64,12 +64,46 @@ namespace ShareSphere.Api.Services
             if (existing == null)
                 return null;
 
+            bool priceChanged = existing.Price != share.Price;
+
             existing.CompanyId = share.CompanyId;
             existing.Price = share.Price;
             existing. AvailableQuantity = share. AvailableQuantity;
 
             await _context.SaveChangesAsync();
+
+            // Wenn Preis geändert wurde, aktualisiere alle betroffenen Portfolios
+            if (priceChanged)
+            {
+                await RecalculateAffectedPortfoliosAsync(shareId);
+            }
+
             return existing;
+        }
+
+               /// <summary>
+        /// Berechnet PortfolioValues aller Shareholders neu, die diesen Share besitzen
+        /// </summary>
+        private async Task RecalculateAffectedPortfoliosAsync(int shareId)
+        {
+            // Finde alle Shareholders, die diesen Share besitzen
+            var affectedShareholders = await _context.Shareholders
+                .Include(s => s.Portfolios)
+                    .ThenInclude(p => p.Share)
+                .Where(s => s. Portfolios.Any(p => p.ShareId == shareId))
+                .ToListAsync();
+
+            foreach (var shareholder in affectedShareholders)
+            {
+                // Berechne neuen Portfolio-Wert
+                decimal newValue = shareholder.Portfolios
+                    .Where(p => p.Share != null)
+                    .Sum(p => p. amount * p.Share!.Price);
+
+                shareholder.PortfolioValue = newValue;
+            }
+
+            await _context. SaveChangesAsync();
         }
 
         public async Task<bool> DeleteAsync(int shareId)

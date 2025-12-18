@@ -5,6 +5,8 @@ namespace ShareSphere.Api.Services
     public interface ISharePurchaseService
     {
         Task<PurchaseResult> PurchaseSharesAsync(int shareholderId, int shareId, int quantity, int brokerId);
+        Task<PurchaseResult> SellSharesAsync(int shareholderId, int shareId, int quantity, int brokerId);
+
     }
 
     /// <summary>

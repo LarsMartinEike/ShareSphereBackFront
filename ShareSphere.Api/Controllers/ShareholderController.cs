@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using ShareSphere.Api.Models;
 using ShareSphere.Api.Services;
 using System.ComponentModel. DataAnnotations;
+using ShareSphere.Api.Models.Dtos;
 
 namespace ShareSphere.Api.Controllers
 {
@@ -154,5 +155,67 @@ public async Task<IActionResult> PurchaseShares(
         portfolio = result.Portfolio
     });
     }  
+
+
+        // DTO for share transactions
+        public record ShareTransactionRequest(
+            [Required] int ShareId,
+            [Required, Range(1, int.MaxValue, ErrorMessage = "Quantity must be at least 1")] int Quantity,
+            [Required] int BrokerId
+        );
+
+        /// <summary>
+        /// Verkauft Shares eines Shareholders
+        /// </summary>
+        [Authorize(Roles = "admin,user")]
+        [HttpPost("{id}/sell-shares")]
+        public async Task<IActionResult> SellShares(int id, [FromBody] ShareTransactionRequest request)
+        {
+            var result = await _purchaseService.SellSharesAsync(
+                id,
+                request.ShareId,
+                request.Quantity,
+                request. BrokerId
+            );
+
+            if (!result.Success)
+            {
+                return BadRequest(new { message = result.Message });
+            }
+
+            return Ok(new
+            {
+                message = result.Message,
+                trade = result.Trade,
+                portfolio = result.Portfolio
+            });
+        }
+
+
+        
+        /// <summary>
+        /// Gibt das komplette Portfolio eines Shareholders zurück mit: 
+        /// - List of shares owned
+        /// - Quantity per share
+        /// - Current price per share
+        /// - Total portfolio value
+        /// </summary>
+        /// <param name="id">Shareholder ID</param>
+        /// <returns>Portfolio-Details</returns>
+        [HttpGet("{id}/portfolio")]
+        [ProducesResponseType(typeof(ShareholderPortfolioDto), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> GetPortfolio(int id)
+        {
+            var portfolio = await _shareholderService.GetShareholderPortfolioAsync(id);
+            
+            if (portfolio == null)
+                return NotFound(new { message = $"Shareholder with ID {id} not found." });
+
+            return Ok(portfolio);
+        }
+    
     }
+
+    
 }
