@@ -136,8 +136,10 @@ using (var scope = app.Services.CreateScope())
     {
         var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
         var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
+        var dbContext = services.GetRequiredService<AppDbContext>();
         
         await DbInitializer.SeedAdminUser(userManager, roleManager);
+        await DbInitializer.SeedStockExchanges(dbContext);
     }
     catch (Exception ex)
     {

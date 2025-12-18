@@ -55,5 +55,77 @@ namespace ShareSphere.Api.Data
                 Console.WriteLine($"ℹ Admin user '{adminUserName}' already exists");
             }
         }
+
+        public static async Task SeedStockExchanges(AppDbContext context)
+        {
+            // Check if stock exchanges already exist
+            if (context.StockExchanges.Any())
+            {
+                Console.WriteLine("ℹ Stock exchanges already seeded");
+                return;
+            }
+
+            var stockExchanges = new List<StockExchange>
+            {
+                new StockExchange
+                {
+                    Name = "New York Stock Exchange",
+                    Country = "United States",
+                    Currency = "USD"
+                },
+                new StockExchange
+                {
+                    Name = "NASDAQ",
+                    Country = "United States",
+                    Currency = "USD"
+                },
+                new StockExchange
+                {
+                    Name = "London Stock Exchange",
+                    Country = "United Kingdom",
+                    Currency = "GBP"
+                },
+                new StockExchange
+                {
+                    Name = "Tokyo Stock Exchange",
+                    Country = "Japan",
+                    Currency = "JPY"
+                },
+                new StockExchange
+                {
+                    Name = "Shanghai Stock Exchange",
+                    Country = "China",
+                    Currency = "CNY"
+                },
+                new StockExchange
+                {
+                    Name = "Hong Kong Stock Exchange",
+                    Country = "Hong Kong",
+                    Currency = "HKD"
+                },
+                new StockExchange
+                {
+                    Name = "Euronext",
+                    Country = "European Union",
+                    Currency = "EUR"
+                },
+                new StockExchange
+                {
+                    Name = "Frankfurt Stock Exchange",
+                    Country = "Germany",
+                    Currency = "EUR"
+                },
+                new StockExchange
+                {
+                    Name = "Toronto Stock Exchange",
+                    Country = "Canada",
+                    Currency = "CAD"
+                }
+            };
+
+            await context.StockExchanges.AddRangeAsync(stockExchanges);
+            await context.SaveChangesAsync();
+            Console.WriteLine($"✓ Seeded {stockExchanges.Count} stock exchanges");
+        }
     }
 }
