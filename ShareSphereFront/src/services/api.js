@@ -1,4 +1,4 @@
-const API_BASE_URL = 'https://localhost:7274/api';
+const API_BASE_URL = 'http://localhost:5133/api';
 
 /**
  * Fetches all stock exchanges from the backend API
