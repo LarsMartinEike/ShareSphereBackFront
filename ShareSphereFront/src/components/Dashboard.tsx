@@ -1,384 +1,237 @@
-import { useEffect, useState } from 'react'
+import React, { useState, useEffect } from 'react';
+import { Building2, TrendingUp, ChevronRight, Loader2 } from 'lucide-react';
+import { ExchangeCard } from './ExchangeCard';
+import { CompanyList } from './CompanyList';
+import { ShareList } from './ShareList';
+import { EmptyState } from './EmptyState';
+import { apiFetch } from '../api/client';
 
-interface User {
-  name: string
-  displayName?: string
-  roles?: string[]
-}
 
-interface Company {
-  companyId: number
-  name: string
-  tickerSymbol: string
-  exchangeId: number
-  stockExchange?: {
-    exchangeId: number
-    name:  string
-    country: string
-    currency: string
-  }
-}
+// Mock API data structures matching expected backend responses
+// API Endpoint: GET /api/exchanges
 
-interface Share {
-  shareId: number
-  companyId:  number
-  price:  number
-  availableQuantity:  number
-}
+// API Endpoint: GET /api/exchanges/{exchangeId}/companies
 
-interface Trade {
-  tradeId: number
-  companyId: number
-  brokerId: number
-  quantity:  number
-  unitPrice: number
-  timestamp: string
-  type:  'Buy' | 'Sell'
-}
+// API Endpoint: GET /api/companies/{companyId}/shares
 
-interface Broker {
-  brokerId: number
-  name: string
-  licenseNumber: string
-  email:  string
-}
 
-interface Shareholder {
-  shareholderId: number
-  name: string
-  email: string
-  portfolioValue:  number
-}
+export function Dashboard() {
+  const [loading, setLoading] = useState(true);
+  const [exchanges, setExchanges] = useState<any[]>([]);
+  const [selectedExchange, setSelectedExchange] = useState<any | null>(null);
+  const [selectedCompany, setSelectedCompany] = useState<any | null>(null);
+  const [companies, setCompanies] = useState<any[]>([]);
+  const [shares, setShares] = useState<any[]>([]);
+  const [loadingCompanies, setLoadingCompanies] = useState(false);
+  const [loadingShares, setLoadingShares] = useState(false);
 
-interface StockExchange {
-  exchangeId:  number
-  name: string
-  country: string
-  currency: string
-}
 
-export default function Dashboard() {
-  const [user, setUser] = useState<User | null>(null)
-  const [companies, setCompanies] = useState<Company[]>([])
-  const [shares, setShares] = useState<Share[]>([])
-  const [trades, setTrades] = useState<Trade[]>([])
-  const [brokers, setBrokers] = useState<Broker[]>([])
-  const [shareholders, setShareholders] = useState<Shareholder[]>([])
-  const [stockExchanges, setStockExchanges] = useState<StockExchange[]>([])
-  const [loading, setLoading] = useState<boolean>(true)
-  const [error, setError] = useState<string | null>(null)
-
-  const API_BASE_URL:  string = import.meta.env.VITE_API_URL || 'https://localhost:7189'
-
-  useEffect(() => {
-    fetchDashboardData()
-  }, [])
-
-  const getAuthHeaders = (): HeadersInit => {
-    const token = localStorage.getItem('token')
-    return {
-      'Content-Type': 'application/json',
-      'Authorization': token ? `Bearer ${token}` : ''
-    }
-  }
-
-  const fetchDashboardData = async (): Promise<void> => {
-    setLoading(true)
-    setError(null)
-
+  // Simulated API call: GET /api/exchanges
+useEffect(() => {
+  const fetchExchanges = async () => {
     try {
-      // Benutzerinformationen abrufen
-      const userResponse = await fetch(`${API_BASE_URL}/api/auth/me`, {
-        headers: getAuthHeaders()
-      })
-
-      if (userResponse.ok) {
-        const userData:  User = await userResponse.json()
-        setUser(userData)
-      }
-
-      // Alle Daten parallel abrufen
-      const [
-        companiesRes,
-        sharesRes,
-        tradesRes,
-        brokersRes,
-        shareholdersRes,
-        exchangesRes
-      ] = await Promise.all([
-        fetch(`${API_BASE_URL}/api/companies`, { headers: getAuthHeaders() }),
-        fetch(`${API_BASE_URL}/api/shares`, { headers: getAuthHeaders() }),
-        fetch(`${API_BASE_URL}/api/trades`, { headers: getAuthHeaders() }),
-        fetch(`${API_BASE_URL}/api/brokers`, { headers: getAuthHeaders() }),
-        fetch(`${API_BASE_URL}/api/shareholders`, { headers: getAuthHeaders() }),
-        fetch(`${API_BASE_URL}/api/stockexchanges`, { headers: getAuthHeaders() })
-      ])
-
-      if (companiesRes.ok) {
-        const companiesData: Company[] = await companiesRes.json()
-        setCompanies(companiesData)
-      }
-      if (sharesRes.ok) {
-        const sharesData: Share[] = await sharesRes.json()
-        setShares(sharesData)
-      }
-      if (tradesRes. ok) {
-        const tradesData: Trade[] = await tradesRes.json()
-        setTrades(tradesData)
-      }
-      if (brokersRes.ok) {
-        const brokersData: Broker[] = await brokersRes.json()
-        setBrokers(brokersData)
-      }
-      if (shareholdersRes. ok) {
-        const shareholdersData: Shareholder[] = await shareholdersRes.json()
-        setShareholders(shareholdersData)
-      }
-      if (exchangesRes.ok) {
-        const exchangesData:  StockExchange[] = await exchangesRes.json()
-        setStockExchanges(exchangesData)
-      }
-
+      setLoading(true);
+      const data = await apiFetch<any[]>('/api/stockexchanges');
+      setExchanges(data);
     } catch (err) {
-      const errorMessage = err instanceof Error ?  err.message : 'Unbekannter Fehler'
-      setError('Fehler beim Laden der Dashboard-Daten: ' + errorMessage)
-      console.error('Dashboard Error:', err)
+      console.error(err);
+      setExchanges([]);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
-  const handleLogout = (): void => {
-    localStorage.removeItem('token')
-    window.location.href = '/login'
+  fetchExchanges();
+}, []);
+
+  // Simulated API call: GET /api/exchanges/{exchangeId}/companies
+const handleExchangeSelect = async (exchange: any) => {
+  try {
+    setSelectedExchange(exchange);
+    setSelectedCompany(null);
+    setCompanies([]);
+    setShares([]);
+    setLoadingCompanies(true);
+
+    const exchangeData = await apiFetch<any>(
+      `/api/stockexchanges/${exchange.exchangeId}`
+    );
+
+    setCompanies(exchangeData.companies);
+  } catch (error) {
+    console.error(error);
+    setCompanies([]);
+  } finally {
+    setLoadingCompanies(false);
   }
+};
+
+  // Simulated API call: GET /api/companies/{companyId}/shares
+const handleCompanySelect = async (company: any) => {
+  try {
+    setSelectedCompany(company);
+    setShares([]);
+    setLoadingShares(true);
+
+    const shares = await apiFetch<any>(
+      `/api/shares/company/${company.companyId}`
+    );
+
+    setShares(shares);
+  } catch (error) {
+    console.error(error);
+    setShares([]);
+  } finally {
+    setLoadingShares(false);
+  }
+};
+
+  const handleBackToExchanges = () => {
+    setSelectedExchange(null);
+    setSelectedCompany(null);
+    setCompanies([]);
+    setShares([]);
+  };
+
+  const handleBackToCompanies = () => {
+    setSelectedCompany(null);
+    setShares([]);
+  };
 
   if (loading) {
     return (
-      <div className="dashboard-container">
-        <div className="loading">Lade Dashboard-Daten...</div>
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="flex flex-col items-center gap-3">
+          <Loader2 className="w-8 h-8 text-blue-600 animate-spin" />
+          <p className="text-gray-600">Loading exchanges...</p>
+        </div>
       </div>
-    )
+    );
   }
 
   return (
-    <div className="dashboard-container">
-      <header className="dashboard-header">
-        <h1>ShareSphere Dashboard</h1>
-        {user && (
-          <div className="user-info">
-            <span>Willkommen, {user.displayName || user.name}</span>
-            {user.roles && <span className="user-roles">({user.roles.join(', ')})</span>}
-            <button onClick={handleLogout} className="btn-logout">Abmelden</button>
-          </div>
+    <div className="space-y-6">
+      {/* Breadcrumb Navigation */}
+      <div className="flex items-center gap-2 text-sm text-gray-600">
+        <button
+          onClick={handleBackToExchanges}
+          className="hover:text-gray-900 transition-colors"
+        >
+          Exchanges
+        </button>
+        {selectedExchange && (
+          <>
+            <ChevronRight className="w-4 h-4" />
+            <button
+              onClick={handleBackToCompanies}
+              className="hover:text-gray-900 transition-colors"
+            >
+              {selectedExchange.name}
+            </button>
+          </>
         )}
-      </header>
-
-      {error && <div className="error-message">{error}</div>}
-
-      <div className="dashboard-grid">
-        {/* Statistik-Karten */}
-        <div className="stats-row">
-          <div className="stat-card">
-            <h3>Unternehmen</h3>
-            <div className="stat-value">{companies.length}</div>
-          </div>
-          <div className="stat-card">
-            <h3>Aktien</h3>
-            <div className="stat-value">{shares.length}</div>
-          </div>
-          <div className="stat-card">
-            <h3>Trades</h3>
-            <div className="stat-value">{trades.length}</div>
-          </div>
-          <div className="stat-card">
-            <h3>Broker</h3>
-            <div className="stat-value">{brokers. length}</div>
-          </div>
-          <div className="stat-card">
-            <h3>Aktionäre</h3>
-            <div className="stat-value">{shareholders.length}</div>
-          </div>
-          <div className="stat-card">
-            <h3>Börsen</h3>
-            <div className="stat-value">{stockExchanges.length}</div>
-          </div>
-        </div>
-
-        {/* Unternehmen */}
-        <section className="dashboard-section">
-          <h2>Unternehmen</h2>
-          <div className="table-container">
-            <table>
-              <thead>
-                <tr>
-                  <th>Name</th>
-                  <th>Ticker</th>
-                  <th>Börse</th>
-                </tr>
-              </thead>
-              <tbody>
-                {companies.slice(0, 5).map(company => (
-                  <tr key={company.companyId}>
-                    <td>{company. name}</td>
-                    <td><strong>{company.tickerSymbol}</strong></td>
-                    <td>{company.stockExchange?.name || 'N/A'}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-            {companies.length > 5 && (
-              <p className="table-info">... und {companies.length - 5} weitere</p>
-            )}
-          </div>
-        </section>
-
-        {/* Aktien */}
-        <section className="dashboard-section">
-          <h2>Aktuelle Aktienpreise</h2>
-          <div className="table-container">
-            <table>
-              <thead>
-                <tr>
-                  <th>Company ID</th>
-                  <th>Preis</th>
-                  <th>Verfügbar</th>
-                </tr>
-              </thead>
-              <tbody>
-                {shares.slice(0, 5).map(share => (
-                  <tr key={share.shareId}>
-                    <td>{share.companyId}</td>
-                    <td className="price">{share.price?. toFixed(2)} €</td>
-                    <td>{share.availableQuantity}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-            {shares.length > 5 && (
-              <p className="table-info">... und {shares. length - 5} weitere</p>
-            )}
-          </div>
-        </section>
-
-        {/* Letzte Trades */}
-        <section className="dashboard-section">
-          <h2>Letzte Handelsgeschäfte</h2>
-          <div className="table-container">
-            <table>
-              <thead>
-                <tr>
-                  <th>Typ</th>
-                  <th>Menge</th>
-                  <th>Preis</th>
-                  <th>Datum</th>
-                </tr>
-              </thead>
-              <tbody>
-                {trades.slice(0, 5).map(trade => (
-                  <tr key={trade.tradeId}>
-                    <td>
-                      <span className={`trade-type ${trade.type?. toLowerCase()}`}>
-                        {trade.type}
-                      </span>
-                    </td>
-                    <td>{trade.quantity}</td>
-                    <td className="price">{trade.unitPrice?.toFixed(2)} €</td>
-                    <td>{new Date(trade.timestamp).toLocaleDateString('de-DE')}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-            {trades.length > 5 && (
-              <p className="table-info">... und {trades.length - 5} weitere</p>
-            )}
-          </div>
-        </section>
-
-        {/* Broker */}
-        <section className="dashboard-section">
-          <h2>Registrierte Broker</h2>
-          <div className="table-container">
-            <table>
-              <thead>
-                <tr>
-                  <th>Name</th>
-                  <th>Lizenz</th>
-                  <th>E-Mail</th>
-                </tr>
-              </thead>
-              <tbody>
-                {brokers.slice(0, 5).map(broker => (
-                  <tr key={broker.brokerId}>
-                    <td>{broker.name}</td>
-                    <td>{broker.licenseNumber}</td>
-                    <td>{broker.email}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-            {brokers.length > 5 && (
-              <p className="table-info">... und {brokers.length - 5} weitere</p>
-            )}
-          </div>
-        </section>
-
-        {/* Aktionäre */}
-        <section className="dashboard-section">
-          <h2>Top Aktionäre</h2>
-          <div className="table-container">
-            <table>
-              <thead>
-                <tr>
-                  <th>Name</th>
-                  <th>E-Mail</th>
-                  <th>Portfolio-Wert</th>
-                </tr>
-              </thead>
-              <tbody>
-                {shareholders
-                  .sort((a, b) => (b.portfolioValue || 0) - (a.portfolioValue || 0))
-                  .slice(0, 5)
-                  .map(shareholder => (
-                    <tr key={shareholder.shareholderId}>
-                      <td>{shareholder.name}</td>
-                      <td>{shareholder.email}</td>
-                      <td className="price">{shareholder.portfolioValue?.toFixed(2)} €</td>
-                    </tr>
-                  ))}
-              </tbody>
-            </table>
-            {shareholders.length > 5 && (
-              <p className="table-info">... und {shareholders.length - 5} weitere</p>
-            )}
-          </div>
-        </section>
-
-        {/* Börsen */}
-        <section className="dashboard-section">
-          <h2>Börsen</h2>
-          <div className="table-container">
-            <table>
-              <thead>
-                <tr>
-                  <th>Name</th>
-                  <th>Land</th>
-                  <th>Währung</th>
-                </tr>
-              </thead>
-              <tbody>
-                {stockExchanges. map(exchange => (
-                  <tr key={exchange.exchangeId}>
-                    <td>{exchange.name}</td>
-                    <td>{exchange.country}</td>
-                    <td><strong>{exchange.currency}</strong></td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </section>
+        {selectedCompany && (
+          <>
+            <ChevronRight className="w-4 h-4" />
+            <span className="text-gray-900">{selectedCompany.name}</span>
+          </>
+        )}
       </div>
+
+      {/* Exchanges View */}
+      {!selectedExchange && (
+        <div>
+          <div className="mb-6">
+            <h1 className="text-gray-900 mb-2">Stock Exchanges</h1>
+            <p className="text-gray-600">Select an exchange to view available companies and shares</p>
+          </div>
+
+          {exchanges.length === 0 ? (
+            <EmptyState
+              icon={Building2}
+              title="No exchanges available"
+              description="There are currently no stock exchanges in the system."
+            />
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {exchanges.map(exchange => (
+                <ExchangeCard
+                  key={exchange.id}
+                  exchange={exchange}
+                  onSelect={() => handleExchangeSelect(exchange)}
+                />
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Companies View */}
+      {selectedExchange && !selectedCompany && (
+        <div>
+          <div className="mb-6">
+            <h1 className="text-gray-900 mb-2">{selectedExchange.name}</h1>
+            <p className="text-gray-600">{selectedExchange.description}</p>
+          </div>
+
+          {loadingCompanies ? (
+            <div className="flex items-center justify-center min-h-[300px]">
+              <div className="flex flex-col items-center gap-3">
+                <Loader2 className="w-8 h-8 text-blue-600 animate-spin" />
+                <p className="text-gray-600">Loading companies...</p>
+              </div>
+            </div>
+          ) : companies.length === 0 ? (
+            <EmptyState
+              icon={Building2}
+              title="No companies available"
+              description={`There are currently no companies listed on ${selectedExchange.name}.`}
+              action={{
+                label: 'Back to Exchanges',
+                onClick: handleBackToExchanges,
+              }}
+            />
+          ) : (
+            <CompanyList companies={companies} onSelect={handleCompanySelect} />
+          )}
+        </div>
+      )}
+
+      {/* Shares View */}
+      {selectedCompany && (
+        <div>
+          <div className="mb-6">
+            <h1 className="text-gray-900 mb-2">
+              {selectedCompany.name} ({selectedCompany.ticker})
+            </h1>
+            <p className="text-gray-600">{selectedCompany.description}</p>
+            <div className="flex gap-4 mt-2">
+              <span className="text-sm text-gray-500">Sector: {selectedCompany.sector}</span>
+            </div>
+          </div>
+
+          {loadingShares ? (
+            <div className="flex items-center justify-center min-h-[300px]">
+              <div className="flex flex-col items-center gap-3">
+                <Loader2 className="w-8 h-8 text-blue-600 animate-spin" />
+                <p className="text-gray-600">Loading shares...</p>
+              </div>
+            </div>
+          ) : shares.length === 0 ? (
+            <EmptyState
+              icon={TrendingUp}
+              title="No shares available"
+              description={`There are currently no shares available for ${selectedCompany.name}.`}
+              action={{
+                label: 'Back to Companies',
+                onClick: handleBackToCompanies,
+              }}
+            />
+          ) : (
+            <ShareList shares={shares} company={selectedCompany} />
+          )}
+        </div>
+      )}
     </div>
-  )
+  );
 }

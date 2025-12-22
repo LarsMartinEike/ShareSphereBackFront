@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { Navigation } from './components/Navigation';
-import { Dashboard } from './components/Dashboard';
+import { Dashboard } from './components/Dashboard';  // OHNE geschweifte Klammern
 import { Portfolio } from './components/Portfolio';
 import { TradeForm } from './components/TradeForm';
 import { AdminPanel } from './components/AdminPanel';

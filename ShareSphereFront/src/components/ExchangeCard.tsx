@@ -3,10 +3,10 @@ import { Building2, MapPin, ChevronRight } from 'lucide-react';
 
 interface ExchangeCardProps {
   exchange: {
-    id: number;
+    exchangeId: number;
     name: string;
-    code: string;
-    location: string;
+    currency: string;
+    country: string;
     description: string;
   };
   onSelect: () => void;
@@ -29,11 +29,11 @@ export function ExchangeCard({ exchange, onSelect }: ExchangeCardProps) {
       <div className="space-y-2">
         <h3 className="text-gray-900">{exchange.name}</h3>
         <div className="inline-block px-2 py-1 bg-gray-100 rounded text-sm text-gray-700">
-          {exchange.code}
+          {exchange.currency}
         </div>
         <div className="flex items-center gap-2 text-sm text-gray-600">
           <MapPin className="w-4 h-4" />
-          <span>{exchange.location}</span>
+          <span>{exchange.country}</span>
         </div>
         <p className="text-sm text-gray-600 line-clamp-2">{exchange.description}</p>
       </div>

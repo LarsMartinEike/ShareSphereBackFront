@@ -5,7 +5,7 @@ interface CompanyListProps {
   companies: Array<{
     id: number;
     name: string;
-    ticker: string;
+    tickerSymbol: string;
     sector: string;
     description: string;
   }>;
@@ -52,7 +52,7 @@ export function CompanyList({ companies, onSelect }: CompanyListProps) {
                 </td>
                 <td className="px-6 py-4">
                   <span className="inline-block px-2 py-1 bg-gray-100 rounded text-sm text-gray-700">
-                    {company.ticker}
+                    {company.tickerSymbol}
                   </span>
                 </td>
                 <td className="px-6 py-4 text-gray-600">{company.sector}</td>
